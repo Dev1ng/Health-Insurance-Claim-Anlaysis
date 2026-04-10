@@ -1,0 +1,726 @@
+# %%
+import pandas as pd
+import seaborn as sns
+import numpy as np
+import matplotlib.pyplot as plt
+
+# %%
+#pip install seaborn
+
+# %%
+#pip install plotly
+
+# %%
+import plotly.express as px
+
+# %%
+
+data = pd.read_csv("InsuranceData.csv")
+
+# %%
+data.head()
+
+# %%
+data.info()
+
+# %%
+data.describe()
+
+# %% [markdown]
+# # Distribution of Insurance Claims By Age
+
+# %%
+agg = data.groupby('age').agg(
+    sum_claim=('claim', 'sum'),
+    avg_claim=('claim', 'mean'),
+    count=('claim', 'size'),
+    max_claim = ('claim', 'max')
+).reset_index()
+
+fig = px.bar(agg, x='age', y='sum_claim', text='sum_claim',
+             hover_data={
+                 'avg_claim': ':.2f',
+                 'count': True,
+                 'max_claim': True,
+                 'sum_claim': False  # Hiding sum because already displayed on label
+             },
+             labels={'sum_claim': 'Sum of Claims',
+                     'age': 'Age',
+                     'avg_claim': 'Average Claim',
+                     'max_claim': 'Max Claim',
+                     'count': 'Number of Entries'},
+             title='Sum of Claims by Age with Hover Info')
+
+fig.show()
+
+# %% [markdown]
+# # Distribution of Insurance Claims by Gender
+
+# %%
+agg = data.groupby('gender').agg(
+    sum_claim=('claim', 'sum'),
+    avg_claim=('claim', 'mean'),
+    count=('claim', 'size'),
+    max_claim = ('claim', 'max')
+).reset_index()
+
+fig = px.bar(agg, x='gender', y='sum_claim', text='sum_claim',
+             hover_data={
+                 'avg_claim': ':.2f',
+                 'count': True,
+                 'max_claim': True,
+                 'sum_claim': False  # Hiding sum because already displayed on label
+             },
+             labels={'sum_claim': 'Sum of Claims',
+                     'gender': 'Gender',
+                     'avg_claim': 'Average Claim',
+                     'max_claim': 'Max Claim',
+                     'count': 'Number of Entries'},
+             title='Sum of Claims by Gender with Hover Info')
+
+fig.show()
+
+
+# %% [markdown]
+# # Distribution of Insurance Claims by BMI
+
+# %%
+agg = data.groupby('bmi').agg(
+    sum_claim=('claim', 'sum'),
+    avg_claim=('claim', 'mean'),
+    count=('claim', 'size'),
+    max_claim = ('claim', 'max')
+).reset_index()
+
+fig = px.bar(agg, x='bmi', y='sum_claim', text='sum_claim',
+             hover_data={
+                 'avg_claim': ':.2f',
+                 'count': True,
+                 'max_claim': True,
+                 'sum_claim': False  # Hiding sum because already displayed on label
+             },
+             labels={'sum_claim': 'Sum of Claims',
+                     'bmi': 'BMI',
+                     'avg_claim': 'Average Claim',
+                     'max_claim': 'Max Claim',
+                     'count': 'Number of Entries'},
+             title='Sum of Claims by BMI with Hover Info')
+
+fig.show()
+
+
+# %%
+import pandas as pd
+import plotly.express as px
+
+new_data = data.copy()
+
+# Example: Creating BMI clusters
+bins = [0, 18.5, 25, 30, 100]
+labels = ['Underweight', 'Normal', 'Overweight', 'Obese']
+
+# Assuming 'data' is your DataFrame with 'bmi' and 'claim' columns
+new_data['bmi_cluster'] = pd.cut(data['bmi'], bins=bins, labels=labels)
+
+# Group by bmi_cluster and aggregate sum of claims
+agg = new_data.groupby('bmi_cluster', observed=True).agg(
+    sum_claim=('claim', 'sum'),
+    avg_claim=('claim', 'mean'),
+    count=('claim', 'size')
+).reset_index()
+
+print(agg)  # Optional: check the grouped data
+
+# Plot sum of claims by BMI cluster
+fig = px.bar(agg, x='bmi_cluster', y='sum_claim', text='sum_claim',
+             title='Sum of Insurance Claims by BMI Cluster',
+             labels={'bmi_cluster': 'BMI Category', 'sum_claim': 'Sum of Claims'})
+
+fig.show()
+
+
+# %% [markdown]
+# # Distribution of Insurance Claims by Bloodpressure
+
+# %%
+agg = data.groupby('bloodpressure').agg(
+    sum_claim=('claim', 'sum'),
+    avg_claim=('claim', 'mean'),
+    count=('claim', 'size'),
+    max_claim = ('claim', 'max')
+).reset_index()
+
+fig = px.bar(agg, x='bloodpressure', y='sum_claim', text='sum_claim',
+             hover_data={
+                 'avg_claim': ':.2f',
+                 'count': True,
+                 'max_claim': True,
+                 'sum_claim': False  # Hiding sum because already displayed on label
+             },
+             labels={'sum_claim': 'Sum of Claims',
+                     'bloodpressure': 'Bloodpressure',
+                     'avg_claim': 'Average Claim',
+                     'max_claim': 'Max Claim',
+                     'count': 'Number of Entries'},
+             title='Sum of Claims by Bloodpressure with Hover Info')
+
+fig.show()
+
+
+# %%
+import pandas as pd
+import plotly.express as px
+
+new_data['bp_bin'] = pd.cut(data['bloodpressure'], bins=5)
+
+agg = new_data.groupby('bp_bin').agg(
+    sum_claim=('claim', 'sum'),
+    avg_claim=('claim', 'mean'),
+    count=('claim', 'size'),
+    max_claim=('claim', 'max')
+).reset_index()
+
+agg['bp_bin'] = agg['bp_bin'].astype(str)  # Convert intervals to strings for plotting
+
+fig = px.bar(agg, x='bp_bin', y='sum_claim', text='sum_claim',
+             hover_data={
+                 'avg_claim': ':.2f',
+                 'count': True,
+                 'max_claim': True,
+                 'sum_claim': False
+             },
+             labels={'sum_claim': 'Sum of Claims',
+                     'bp_bin': 'Bloodpressure Range',
+                     'avg_claim': 'Average Claim',
+                     'max_claim': 'Max Claim',
+                     'count': 'Number of Entries'},
+             title='Sum of Claims by Bloodpressure Range with Hover Info')
+
+fig.show()
+
+
+# %%
+data.head()
+
+# %% [markdown]
+# # Distribution of Insurance Claims by Diabetic
+
+# %%
+agg = data.groupby('diabetic').agg(
+    sum_claim=('claim', 'sum'),
+    avg_claim=('claim', 'mean'),
+    count=('claim', 'size'),
+    max_claim = ('claim', 'max')
+).reset_index()
+
+fig = px.bar(agg, x='diabetic', y='sum_claim', text='sum_claim',
+             hover_data={
+                 'avg_claim': ':.2f',
+                 'count': True,
+                 'max_claim': True,
+                 'sum_claim': False  # Hiding sum because already displayed on label
+             },
+             labels={'sum_claim': 'Sum of Claims',
+                     'diabetic': 'Diabetic or Not',
+                     'avg_claim': 'Average Claim',
+                     'max_claim': 'Max Claim',
+                     'count': 'Number of Entries'},
+             title='Sum of Claims by Diabetes with Hover Info')
+
+fig.show()
+
+
+# %% [markdown]
+# # Distribution of Insurance Claims by Number of Children
+
+# %%
+agg = data.groupby('children').agg(
+    sum_claim=('claim', 'sum'),
+    avg_claim=('claim', 'mean'),
+    count=('claim', 'size'),
+    max_claim = ('claim', 'max')
+).reset_index()
+
+fig = px.bar(agg, x='children', y='sum_claim', text=agg['sum_claim'].round(2),
+             hover_data={
+                 'avg_claim': ':.2f',
+                 'count': True,
+                 'max_claim': True,
+                 'sum_claim': False  # Hiding sum because already displayed on label
+             },
+             labels={'sum_claim': 'Sum of Claims',
+                     'children': 'Children',
+                     'avg_claim': 'Average Claim',
+                     'max_claim': 'Max Claim',
+                     'count': 'Number of Entries'},
+             title='Sum of Claims by Number of Children with Hover Info')
+
+fig.show()
+
+# %% [markdown]
+# # Distribution of Insurance Claims by Smoker
+
+# %%
+agg = data.groupby('smoker').agg(
+    sum_claim=('claim', 'sum'),
+    avg_claim=('claim', 'mean'),
+    count=('claim', 'size'),
+    max_claim = ('claim', 'max')
+).reset_index()
+
+fig = px.bar(agg, x='smoker', y='sum_claim', text='sum_claim',
+             hover_data={
+                 'avg_claim': ':.2f',
+                 'count': True,
+                 'max_claim': True,
+                 'sum_claim': False  # Hiding sum because already displayed on label
+             },
+             labels={'sum_claim': 'Sum of Claims',
+                     'diabetic': 'Smoker or Not',
+                     'avg_claim': 'Average Claim',
+                     'max_claim': 'Max Claim',
+                     'count': 'Number of Entries'},
+             title='Sum of Claims by Smoking Habits with Hover Info')
+
+fig.show()
+
+
+# %% [markdown]
+# #  Distribution of Insurance Claims by Region
+
+# %%
+agg = data.groupby('region').agg(
+    sum_claim=('claim', 'sum'),
+    avg_claim=('claim', 'mean'),
+    count=('claim', 'size'),
+    max_claim = ('claim', 'max')
+).reset_index()
+
+fig = px.bar(agg, x='region', y='sum_claim', text=agg['sum_claim'].round(2),
+             hover_data={
+                 'avg_claim': ':.2f',
+                 'count': True,
+                 'max_claim': True,
+                 'sum_claim': False  # Hiding sum because already displayed on label
+             },
+             labels={'sum_claim': 'Sum of Claims',
+                     'region': 'Region',
+                     'avg_claim': 'Average Claim',
+                     'max_claim': 'Max Claim',
+                     'count': 'Number of Entries'},
+             title='Sum of Claims by Region with Hover Info')
+
+fig.show()
+
+
+# %% [markdown]
+# #  Violin plot showing the distribution of insurance claims by age
+
+# %%
+fig = px.violin(data, y="claim", x="age", box=True, points='all',hover_data=data.columns)
+fig.show()
+
+# %%
+fig = px.scatter_3d(data, x='age', y='bmi', z='claim', color='smoker',
+                    title='3D Scatter: Age, BMI, and Claim by Smoker',
+                    labels={'age':'Age', 'bmi':'BMI', 'claim':'Claim Amount'})
+fig.show()
+
+
+# %%
+import plotly.graph_objects as go
+
+# %% [markdown]
+# # the trends of insurance claims over time
+
+# %%
+age_group = data.groupby('age')['claim'].sum()
+fig = go.Figure(data=go.Scatter(x=age_group.index, y=age_group, mode='lines+markers'))
+fig.update_layout(title='Sum of Claims by Age', xaxis_title='Age', yaxis_title='Sum of Claim')
+fig.show()
+
+# %%
+age_group = data.groupby('age')['claim'].mean()
+fig = go.Figure(data=go.Scatter(x=age_group.index, y=age_group, mode='lines+markers'))
+fig.update_layout(title='Average Claims by Age', xaxis_title='Age', yaxis_title='Average Claim')
+fig.show()
+
+
+# %%
+#correlation matrix
+# Correlation matrix on numeric columns only
+corr = data.select_dtypes(include='number').corr()
+
+
+# %%
+#heatmap of the correlation matrix
+sns.heatmap(corr, annot=True)
+plt.show()
+
+# %%
+#pairplot function to generate scatter plots for the variables
+sns.pairplot(data)
+plt.show()
+
+# %%
+#pip install scikit-learn
+
+# %%
+import numpy as np
+from sklearn.impute import SimpleImputer  
+from sklearn.preprocessing import StandardScaler  #numerical
+from scipy import stats
+
+# %%
+def advanced_preprocess_numeric_columns(df, method='median'):
+    # copy of the DataFrame to avoid modifying the original data
+    df = df.copy()
+    
+    # Get a list of all numeric columns
+    numeric_columns = df.select_dtypes(include=['int64', 'float64']).columns
+    
+    # Loop through each numeric column
+    for col in numeric_columns:
+        # Check if the column has missing values or outliers
+        if df[col].isnull().any() or df[col].between(df[col].quantile(.01), df[col].quantile(.99)).all():
+            # Fill missing values using SimpleImputer
+            imputer = SimpleImputer(strategy=method)
+            df[col] = imputer.fit_transform(df[col].values.reshape(-1, 1))
+
+            # Scale the data using StandardScaler
+            scaler = StandardScaler()
+            df[col] = scaler.fit_transform(df[col].values.reshape(-1, 1))
+
+            # Remove outliers using the Z-score
+            z_scores = stats.zscore(df[col])
+            df = df[np.abs(z_scores) < 3]
+            
+    print("Advanced preprocessing steps completed for columns that needed it: filled missing values, scaled data, and removed outliers.")
+    return df
+
+# %%
+modified_df = pd.DataFrame(advanced_preprocess_numeric_columns(data, method='median'))
+
+# %%
+import pandas as pd
+from sklearn.preprocessing import OneHotEncoder
+
+def advanced_preprocess_categorical_columns(df, encoding='onehot', ordinal_columns=None, rare_threshold=10, unknown_categories='Other'):
+    """Takes a Pandas DataFrame and performs advanced preprocessing on all categorical columns.
+    
+    Fills missing values with the mode, removes rare categories, and encodes the data using one-hot encoding or ordinal encoding.
+    
+    Args:
+        df: Pandas DataFrame
+        encoding: encoding method to use ('onehot' or 'ordinal')
+        ordinal_columns: dictionary of ordinal columns and their corresponding categories (e.g., {'column_name': ['low', 'medium', 'high']})
+        rare_threshold: threshold for removing rare categories (default is 10)
+        unknown_categories: label for unknown categories (default is 'Other')
+        
+    Returns:
+        modified DataFrame
+    """
+    # Make a copy of the DataFrame to avoid modifying the original data
+    df = df.copy()
+    
+    # Get a list of all categorical columns
+    categorical_columns = df.select_dtypes(include=['object']).columns
+    
+    # Fill missing values with the mode
+    for col in categorical_columns:
+        df[col] = df[col].fillna(df[col].mode()[0])
+        
+    # Remove rare categories
+    for col in categorical_columns:
+        # Get the counts of each category
+        counts = df[col].value_counts()
+        
+        # Remove categories with less than rare_threshold occurrences
+        df[col] = df[col].apply(lambda x: x if counts[x] >= rare_threshold else unknown_categories)
+        
+    if encoding == 'onehot':
+        # Encode the data using one-hot encoding
+        df = pd.get_dummies(df, columns=categorical_columns, drop_first=True)
+        
+    elif encoding == 'ordinal':
+        # Check if ordinal_columns is provided
+        if ordinal_columns is None:
+            raise ValueError("ordinal_columns must be provided when using ordinal encoding.")
+            
+        # Encode the data using ordinal encoding
+        for col, categories in ordinal_columns.items():
+            df[col] = df[col].astype('category', categories=categories, ordered=True)
+            df[col] = df[col].cat.codes
+            
+    else:
+        raise ValueError("Invalid encoding method. Must be 'onehot' or 'ordinal'.")
+        
+    print("Advanced preprocessing steps completed: filled missing values, removed rare categories, and encoded data.")
+    return df
+
+# Create a new dataframe to store the preprocessed data
+preprocessed_df = pd.DataFrame()
+
+# Preprocess the data and store it in the new dataframe
+preprocessed_df = advanced_preprocess_categorical_columns(modified_df)
+
+# %%
+preprocessed_df
+
+# %%
+preprocessed_df.info()
+
+# %%
+#pip install statsmodels
+
+# %%
+from statsmodels.stats.outliers_influence import variance_inflation_factor
+import pandas as pd
+
+# Drop target column
+X = preprocessed_df.drop(columns=["claim"])
+
+# Keep only numeric columns
+X_numeric = X.select_dtypes(include=['number'])
+
+# Optionally drop rows with missing values or fill them
+X_numeric = X_numeric.dropna()
+
+# Calculate VIF
+vif = pd.DataFrame()
+vif["features"] = X_numeric.columns
+vif["VIF"] = [variance_inflation_factor(X_numeric.values, i) for i in range(X_numeric.shape[1])]
+
+print(vif)
+
+# %% [markdown]
+# the VIF values for all the independent variables are less than 10 which is considered acceptable and indicates that there is no multicollinearity among the independent variables
+
+# %% [markdown]
+# # Split the dataset into training and testing sets
+
+# %%
+preprocessed_df = preprocessed_df.drop(columns=['index','PatientID'])
+
+
+# %%
+from sklearn.model_selection import train_test_split
+
+# Assign the independent variables (X) and dependent variable (y)
+X = preprocessed_df.drop('claim' , axis=1)
+y = preprocessed_df['claim']
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+
+# %%
+print(len(X_train))
+print(len(y_train))
+
+# %%
+from sklearn.linear_model import LinearRegression
+
+lin_reg = LinearRegression()
+
+lin_reg.fit(X_train, y_train)
+
+
+# %%
+import statsmodels.api as sm
+
+
+# %% [markdown]
+#  # Check normality assumption
+
+# %%
+residuals = y_train - lin_reg.predict(X_train)
+fig = sm.graphics.qqplot(residuals, dist=stats.norm, line='45', fit=True)
+plt.show()
+
+
+# %% [markdown]
+# # Check homoscedasticity assumption
+
+# %%
+plt.scatter(lin_reg.predict(X_train), residuals)
+plt.xlabel('Predicted values')
+plt.ylabel('Residuals')
+plt.show()
+
+# %% [markdown]
+# # Check independence assumption
+
+# %%
+plt.scatter(range(len(residuals)), residuals)
+plt.xlabel('Observation')
+plt.ylabel('Residuals')
+plt.show()
+
+# %%
+from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
+
+y_train_pred = lin_reg.predict(X_train)
+
+mae_train = mean_absolute_error(y_train, y_train_pred)
+mse_train = mean_squared_error(y_train, y_train_pred)
+
+y_pred_lin = lin_reg.predict(X_test)
+
+mae_test = mean_absolute_error(y_test, y_pred_lin)
+mse_test = mean_squared_error(y_test, y_pred_lin)
+r2_test = r2_score(y_test, y_pred_lin)
+
+print("Mean Absolute Error (Training): ", mae_train)
+print("Mean Squared Error (Training): ", mse_train)
+print("Mean Absolute Error (Testing): ", mae_test)
+print("Mean Squared Error (Testing): ", mse_test)
+print("R2 Score (Testing): ", r2_test)
+
+# %% [markdown]
+# The model appears to perform similarly on the training and testing sets, with the MAE and MSE being very close for both sets.
+
+# %%
+import matplotlib.pyplot as plt
+
+# Make predictions on the testing data
+y_test_pred = lin_reg.predict(X_test)
+
+# Plot the predicted values against the true values
+plt.scatter(y_test, y_test_pred)
+plt.xlabel("True Values")
+plt.ylabel("Predicted Values")
+plt.title("True vs Predicted Values")
+plt.show()
+
+
+# %%
+from sklearn.metrics import accuracy_score, precision_score, recall_score, confusion_matrix, f1_score
+
+# %%
+from sklearn.tree import DecisionTreeRegressor
+from sklearn.metrics import mean_squared_error, r2_score
+dt_reg = DecisionTreeRegressor()
+dt_reg.fit(X_train, y_train)
+y_pred_dt = dt_reg.predict(X_test)
+dt_mse = mean_squared_error(y_test, y_pred_dt)
+dt_r2 = r2_score(y_test, y_pred_dt)
+print("Decision Tree Model")
+print("Mean Squared Error (Testing): ", dt_mse)
+print("R2 Score (Testing): ", dt_r2)
+
+# %%
+from sklearn.ensemble import RandomForestRegressor
+rf = RandomForestRegressor(n_estimators=100)
+rf.fit(X_train, y_train)
+y_pred = rf.predict(X_test)
+print("Mean Squared Error (Testing): ", mean_squared_error(y_test, y_pred))
+print("R2 Score (Testing): ", r2_score(y_test, y_pred))
+
+
+# %%
+from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
+
+# %%
+# Create an instance of the Random Forest model
+rf_reg = RandomForestRegressor()
+
+rf_reg.fit(X_train, y_train)
+
+y_pred_rf = rf_reg.predict(X_test)
+
+mse = mean_squared_error(y_test, y_pred_rf)
+print("Random Forest model")
+print("Mean Squared Error (Testing): ", mse)
+r2 = r2_score(y_test, y_pred_rf)
+print("R2 Score (Testing): ", r2)
+
+
+# %%
+# Create an instance of the Gradient Boosting model
+gb_reg = GradientBoostingRegressor()
+
+gb_reg.fit(X_train, y_train)
+
+y_pred_gb = gb_reg.predict(X_test)
+
+mse = mean_squared_error(y_test, y_pred_gb)
+print("Gradient Boosting model")
+print("Mean Squared Error (Testing): ", mse)
+
+r2 = r2_score(y_test, y_pred_gb)
+print("R2 Score (Testing): ", r2)
+
+# %% [markdown]
+# As we can see from the above evaluation results, the Gradient Boosting model has the lowest Mean Squared Error and the highest R2 Score on the testing data, which means it has the best performance among all the models tried.
+# 
+# Based on the R-squared and mean squared error values reported for the Gradient Boosting model, it appears to be performing well and generalizing well to the testing data. The R-squared value of 0.805 indicates that the model is explaining a good amount of the variance in the target variable, and the mean squared error value is relatively low, indicating that the model's predictions are close to the true values
+
+# %%
+results = {
+    'Model': ['Linear Regression', 'Decision Tree', 'Random Forest', 'Gradient Boosting'],
+    'MSE': [
+        mean_squared_error(y_test, y_pred_lin),
+        mean_squared_error(y_test, y_pred_dt),
+        mean_squared_error(y_test, y_pred_rf),
+        mean_squared_error(y_test, y_pred_gb)
+    ],
+    'R2 Score': [
+        r2_score(y_test, y_pred_lin),
+        r2_score(y_test, y_pred_dt),
+        r2_score(y_test, y_pred_rf),
+        r2_score(y_test, y_pred_gb)
+    ]
+}
+
+# Create DataFrame
+results_df = pd.DataFrame(results)
+
+print(results_df)
+
+
+# %%
+# a=float(input("Enter age:----------"))
+# b=float(input("Enter bmi:----------"))
+# c=int(input("Enter bp :----------"))
+# f=int(input("Enter no. of children:----------"))
+# l=int(input("Enter gender:----------"))
+# e=int(input("Enter whether a diabetic:-----------"))
+# d=int(input("Enter whether a smoker:----------"))
+# r=int(input("Enter whether region is northwest:----------"))
+# m=int(input("Enter whether region is southeast:----------"))
+# n=int(input("Enter whether region is southwest:----------"))
+
+# %%
+preprocessed_df.head()
+
+# %%
+a = 45.0       # age
+b = 27.5       # bmi
+c = 120        # bp
+f = 2          # no. of children
+l = 1          # gender (e.g. 1=male, 0=female)
+e = 0          # diabetic (0/1)
+d = 1          # smoker (0/1)
+r = 0          # region northwest (0/1)
+m = 1          # region southeast (0/1)
+n = 0          # region southwest (0/1)
+
+# %%
+A=[a,b,c,f,l,e,d,r,m,n]
+
+# %%
+ANS=lin_reg.predict([A])
+ANS
+
+# %%
+ANS= rf_reg.predict([A])
+ANS
+
+# %%
+ANS= gb_reg.predict([A])
+ANS
+
+# %%
+
+
+
